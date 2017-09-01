@@ -1,4 +1,5 @@
 import React from 'react'
+import {Route, Link} from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
 import Search from "./Search";
@@ -6,13 +7,7 @@ import Bookshelf from "./Bookshelf";
 
 class BooksApp extends React.Component {
     state = {
-        /**
-         * TODO: Instead of using this state variable to keep track of which page
-         * we're on, use the URL in the browser's address bar. This will ensure that
-         * users can use the browser's back and forward buttons to navigate between
-         * pages, as well as provide a good URL they can bookmark and share.
-         */
-        showSearchPage: false,
+        searchResult: [],
         bookshelves: {
             'currentlyReading': {
                 title: 'Currently Reading',
@@ -33,53 +28,64 @@ class BooksApp extends React.Component {
         BooksAPI.getAll().then(books => {
             const bookshelves = {...this.state.bookshelves}
             books.forEach(book => {
-                switch (book.shelf) {
-                    case 'currentlyReading':
-                        bookshelves['currentlyReading'].books.push(book)
-                        break
-                    case 'wantToRead':
-                        bookshelves['wantToRead'].books.push(book)
-                        break
-                    case 'read':
-                        bookshelves['read'].books.push(book)
-                        break
-                    default:
-                        break
+                if (bookshelves[book.shelf]) {
+                    bookshelves[book.shelf].books.push(book)
                 }
             })
 
             this.setState({
-                bookshelves: bookshelves
+                bookshelves
             })
+        })
+    }
+
+    searchBooks = (query) => {
+        BooksAPI.search(query).then(result => {
+            if (!result.error) {
+                // console.log(query)
+                this.setState({
+                    searchResult: result
+                })
+            } else {
+                console.log('error')
+            }
         })
     }
 
     render() {
         return (
             <div className="app">
-                {this.state.showSearchPage ? (
-                    <Search/>
-                ) : (
-                    <div className="list-books">
-                        <div className="list-books-title">
-                            <h1>MyReads</h1>
-                        </div>
-                        <div className="list-books-content">
-                            <div>
-                                {Object.entries(this.state.bookshelves).map(([id, bookshelf]) => {
-                                    return (<Bookshelf
-                                        key={id}
-                                        title={bookshelf.title}
-                                        books={bookshelf.books}
-                                    />)
-                                })}
+                <Route exact path="/" render={() => {
+                    return (
+                        <div className="list-books">
+                            <div className="list-books-title">
+                                <h1>MyReads</h1>
+                            </div>
+                            <div className="list-books-content">
+                                <div>
+                                    {Object.entries(this.state.bookshelves).map(([id, bookshelf]) => {
+                                        return (<Bookshelf
+                                            key={id}
+                                            title={bookshelf.title}
+                                            books={bookshelf.books}
+                                        />)
+                                    })}
+                                </div>
+                            </div>
+                            <div className="open-search">
+                                <Link to="/search">Add a book</Link>
                             </div>
                         </div>
-                        <div className="open-search">
-                            <a onClick={() => this.setState({showSearchPage: true})}>Add a book</a>
-                        </div>
-                    </div>
-                )}
+                    )
+                }}/>
+                <Route path="/search" render={() => {
+                    return (
+                        <Search
+                            searchResult={this.state.searchResult}
+                            search={(query) => this.searchBooks(query)}
+                        />
+                    )
+                }}/>
             </div>
         )
     }
