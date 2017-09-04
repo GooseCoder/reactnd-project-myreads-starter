@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Book = ({imageLinks, title, authors}) => {
+const Book = ({imageLinks, title, authors = []}) => {
     return(
         <div className="book">
             <div className="book-top">

@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {Link} from 'react-router-dom'
 import Book from "./Book"
 
-const WAIT_INTERVAL = 1000;
+const WAIT_INTERVAL = 500;
 
 export default class Search extends Component{
     timer = null
