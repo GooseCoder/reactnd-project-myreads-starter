@@ -1,12 +1,17 @@
 import React from 'react'
 
-const Book = ({imageLinks, title, authors = []}) => {
+const Book = (props) => {
+    const authors = props.authors !== undefined ? props.authors : []
     return(
         <div className="book">
             <div className="book-top">
-                <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url("${imageLinks.thumbnail}")` }}></div>
+                <div
+                    className="book-cover"
+                    style={{ width: 128, height: 193, backgroundImage: `url("${props.imageLinks.thumbnail}")` }}
+                >
+                </div>
                 <div className="book-shelf-changer">
-                    <select>
+                    <select onChange={(e) => props.onChangeBookself(e.target.value, props)}>
                         <option value="none" disabled>Move to...</option>
                         <option value="currentlyReading">Currently Reading</option>
                         <option value="wantToRead">Want to Read</option>
@@ -15,7 +20,7 @@ const Book = ({imageLinks, title, authors = []}) => {
                     </select>
                 </div>
             </div>
-            <div className="book-title">{title}</div>
+            <div className="book-title">{props.title}</div>
             <div className="book-authors">{authors.join(", ")}</div>
         </div>
     )

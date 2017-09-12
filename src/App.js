@@ -10,18 +10,26 @@ class BooksApp extends React.Component {
         searchResult: [],
         bookshelves: {
             'currentlyReading': {
+                id: 'currentlyReading',
                 title: 'Currently Reading',
                 books: []
             },
             'wantToRead': {
+                id: 'wantToRead',
                 title: 'Want to Read',
                 books: []
             },
             'read': {
+                id: 'read',
                 title: 'Read',
                 books: []
             }
         }
+    }
+
+    constructor(props) {
+        super(props)
+        this.onChangeBookself = this.onChangeBookself.bind(this)
     }
 
     componentDidMount() {
@@ -51,6 +59,29 @@ class BooksApp extends React.Component {
         })
     }
 
+    removeBookFromShelf(book, bookshelves) {
+        // return bookshelves.values().map(shelf => {
+        //     const newShelf = {...shelf}
+        //     newShelf.books = shelf.books.filter(savedBook => savedBook.id !== book.id)
+        //     return newShelf
+        // })
+    }
+
+    onChangeBookself(self, book) {
+        BooksAPI.update(book, self).then(result => {
+            const bookshelves = {...this.state.bookshelves}
+            if (!result.error) {
+                // this.removeBookFromShelf(book)
+                bookshelves[self].books.push(book)
+                this.setState({
+                    bookshelves
+                })
+            } else {
+                console.log('error')
+            }
+        })
+    }
+
     render() {
         return (
             <div className="app">
@@ -67,6 +98,7 @@ class BooksApp extends React.Component {
                                             key={id}
                                             title={bookshelf.title}
                                             books={bookshelf.books}
+                                            onChangeBookself={this.onChangeBookself}
                                         />)
                                     })}
                                 </div>

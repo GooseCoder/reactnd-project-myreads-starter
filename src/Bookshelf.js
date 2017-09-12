@@ -1,15 +1,15 @@
 import React from 'react'
 import Book from "./Book";
 
-const Bookshelf = (props) => {
+const Bookshelf = ({title, onChangeBookself, books}) => {
     return (
         <div className="bookshelf">
-            <h2 className="bookshelf-title">{props.title}</h2>
+            <h2 className="bookshelf-title">{title}</h2>
             <div className="bookshelf-books">
                 <ol className="books-grid">
-                    {props.books.map((book) => (
+                    {books.map((book) => (
                         <li key={book.id}>
-                            <Book {...book} />
+                            <Book {...book} onChangeBookself={onChangeBookself} />
                         </li>
                     ))}
                 </ol>
