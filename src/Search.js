@@ -40,7 +40,7 @@ export default class Search extends Component{
                     <ol className="books-grid">
                         {this.props.searchResult.map(book => (
                             <li key={book.id}>
-                                <Book {...book}/>
+                                <Book {...book} onAssignBookshelf={this.props.onAssignBookshelf}/>
                             </li>
                         ))}
                     </ol>

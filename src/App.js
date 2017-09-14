@@ -29,7 +29,7 @@ class BooksApp extends React.Component {
 
     constructor(props) {
         super(props)
-        this.onChangeBookself = this.onChangeBookself.bind(this)
+        this.onAssignBookshelf = this.onAssignBookshelf.bind(this)
     }
 
     componentDidMount() {
@@ -59,20 +59,25 @@ class BooksApp extends React.Component {
         })
     }
 
-    removeBookFromShelf(book, bookshelves) {
-        // return bookshelves.values().map(shelf => {
-        //     const newShelf = {...shelf}
-        //     newShelf.books = shelf.books.filter(savedBook => savedBook.id !== book.id)
-        //     return newShelf
-        // })
+    removeBookFromShelf(book, bookshelf) {
+        return bookshelf.books.filter(storedBook => storedBook.id !== book.id)
     }
 
-    onChangeBookself(self, book) {
-        BooksAPI.update(book, self).then(result => {
+    onAssignBookshelf(book, shelf) {
+        const updatedBook = {...book}
+        BooksAPI.update(updatedBook, shelf).then(result => {
             const bookshelves = {...this.state.bookshelves}
             if (!result.error) {
-                // this.removeBookFromShelf(book)
-                bookshelves[self].books.push(book)
+                bookshelves[updatedBook.shelf].books = this.removeBookFromShelf(
+                    updatedBook,
+                    bookshelves[updatedBook.shelf]
+                )
+                if (shelf !== 'none') {
+                    updatedBook.shelf = shelf
+                }else {
+                    delete updatedBook.shelf
+                }
+                bookshelves[shelf].books.push(updatedBook)
                 this.setState({
                     bookshelves
                 })
@@ -98,7 +103,7 @@ class BooksApp extends React.Component {
                                             key={id}
                                             title={bookshelf.title}
                                             books={bookshelf.books}
-                                            onChangeBookself={this.onChangeBookself}
+                                            onAssignBookshelf={this.onAssignBookshelf}
                                         />)
                                     })}
                                 </div>
@@ -113,6 +118,7 @@ class BooksApp extends React.Component {
                     return (
                         <Search
                             searchResult={this.state.searchResult}
+                            onAssignBookself={this.onAssignBookself}
                             search={(query) => this.searchBooks(query)}
                         />
                     )
